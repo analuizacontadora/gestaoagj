@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Integrada - 4 Setores</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            height: 100vh;
+        }
+
+        body.deslogado {
+            justify-content: center;
+            align-items: center;
+        }
+
+        body.deslogado .sidebar,
+        body.deslogado .main-content {
+            display: none;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background-color: #0D3B66;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 2px solid #1E90FF;
+            padding-bottom: 15px;
+        }
+
+        .user-info {
+            background-color: rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 12px;
+        }
+
+        .nav-item button {
+            width: 100%;
+            padding: 12px 15px;
+            background: none;
+            border: 2px solid transparent;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            text-align: left;
+            transition: all 0.3s;
+        }
+
+        .nav-item button:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-color: #1E90FF;
+        }
+
+        .nav-item button.active {
+            background-color: #1E90FF;
+            border-color: #1E90FF;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            margin-top: 30px;
+            padding: 12px 15px;
+            background-color: #e74c3c;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .logout-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #0D3B66;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #0D3B66;
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1E90FF;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+            font-size: 12px;
+        }
+
+        .required {
+            color: #e74c3c;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #722F37;
+            background-color: #fafafa;
+        }
+
+        .checklist-section {
+            margin-top: 15px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin-bottom: 6px;
+            background-color: #F5ECED;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .checklist-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: #0D3B66;
+        }
+
+        .checklist-item label {
+            margin: 0;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-save {
+            flex: 1;
+            background-color: #0D3B66;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background-color: #051d33;
+        }
+
+        .btn-reset {
+            flex: 1;
+            background-color: #1E90FF;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background-color: #1678dd;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 11px;
+            background-color: #0D3B66;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .btn-small:hover {
+            background-color: #051d33;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+
+        thead {
+            background-color: #F5ECED;
+        }
+
+        th {
+            padding: 8px;
+            text-align: left;
+            font-weight: 600;
+            color: #0D3B66;
+            border-bottom: 2px solid #1E90FF;
+        }
+
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #fafafa;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .alert {
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: none;
+            font-size: 12px;
+        }
+
+        .alert.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .alert.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0D3B66;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #1E90FF;
+            padding-bottom: 10px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: 1;
+            }
+        }
+
+        /* TELA DE LOGIN */
+        #telaLogin {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0D3B66 0%, #1E90FF 100%);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #telaLogin.ativo {
+            display: flex;
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            color: #0D3B66;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .login-container p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-form input {
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #0D3B66;
+            background-color: #f9f9f9;
+        }
+
+        .login-form button {
+            padding: 12px;
+            background-color: #0D3B66;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .login-form button:hover {
+            background-color: #1E90FF;
+        }
+
+        .login-message {
+            font-size: 12px;
+            color: #999;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDmb_mCzw1fBBcWHwmAlN2xFOI-eDKN-9I",
+  authDomain: "agj-contabilidade.firebaseapp.com",
+  databaseURL: "https://agj-contabilidade-default-rtdb.firebaseio.com",
+  projectId: "agj-contabilidade",
+  storageBucket: "agj-contabilidade.firebasestorage.app",
+  messagingSenderId: "586326069475",
+  appId: "1:586326069475:web:2c228b397338ae956c75d6",
+  measurementId: "G-P06LVBS0QQ"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);</head>
+<body>
+    <!-- TELA DE LOGIN -->
+    <div id="telaLogin" class="ativo">
+        <div class="login-container">
+            <h1>🔐 AGJ Contabilidade</h1>
+            <p>Gestão Integrada - 4 Setores</p>
+            <form class="login-form" onsubmit="fazerLogin(event)">
+                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="password" id="loginSenha" placeholder="Senha" required>
+                <button type="submit">Entrar</button>
+            </form>
+            <div class="login-message">
+                📧 Use qualquer email/senha cadastrados<br>
+                ou <strong>ana@agj.com.br</strong> para testar
+            </div>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>AGJ</h2>
+        
+        <div class="user-info">
+            👤 <span id="nomeUsuarioLogado">AGJ Contabilidade</span>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <button class="nav-btn active" onclick="abrirSecao('painel')">📋 Painel</button>
+            </li>
+            <li class="nav-item" id="itemSocietario">
+                <button class="nav-btn" onclick="abrirSecao('societario')">📁 Societário</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-btn" onclick="abrirSecao('contabil')">📊 Contábil</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-btn" onclick="abrirSecao('fiscal')">💰 Fiscal</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-btn" onclick="abrirSecao('pessoal')">👥 Pessoal</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-btn" onclick="abrirSecao('usuarios')">👤 Usuários</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-btn" onclick="abrirSecao('auditoria')">📈 Auditoria</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-btn" onclick="abrirSecao('backup')">💾 Backup</button>
+            </li>
+        </ul>
+
+        <button class="logout-btn" onclick="logout()">🚪 Sair</button>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- PAINEL -->
+        <section id="painel" class="section active">
+            <div class="header">
+                <h1>GESTÃO INTEGRADA - 4 SETORES</h1>
+                <p>Bem-vindo ao sistema de gestão de processos AGJ Contabilidade</p>
+            </div>
+
+            <div class="content-grid" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="card" style="text-align: center; cursor: pointer;" onclick="abrirSecao('societario')">
+                    <div style="font-size: 32px; margin-bottom: 10px;">📁</div>
+                    <h3 style="color: #722F37; margin-bottom: 5px;">SOCIETÁRIO</h3>
+                </div>
+                <div class="card" style="text-align: center; cursor: pointer;" onclick="abrirSecao('contabil')">
+                    <div style="font-size: 32px; margin-bottom: 10px;">📊</div>
+                    <h3 style="color: #722F37; margin-bottom: 5px;">CONTÁBIL</h3>
+                </div>
+                <div class="card" style="text-align: center; cursor: pointer;" onclick="abrirSecao('fiscal')">
+                    <div style="font-size: 32px; margin-bottom: 10px;">💰</div>
+                    <h3 style="color: #722F37; margin-bottom: 5px;">FISCAL</h3>
+                </div>
+                <div class="card" style="text-align: center; cursor: pointer;" onclick="abrirSecao('pessoal')">
+                    <div style="font-size: 32px; margin-bottom: 10px;">👥</div>
+                    <h3 style="color: #722F37; margin-bottom: 5px;">PESSOAL</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- SOCIETÁRIO -->
+        <section id="societario" class="section">
+            <div class="header">
+                <h1>📁 SOCIETÁRIO</h1>
+                <p>Legalização de Empresas • CNPJ • Registros</p>
+            </div>
+
+            <div id="alertaSocietario" class="alert"></div>
+
+            <div class="content-grid full-width">
+                <!-- FORMULÁRIO -->
+                <div class="card">
+                    <h2>✏️ Novo Processo</h2>
+
+                    <form id="formSocietario">
+                        <div class="form-group">
+                            <label>Nome da Empresa <span class="required">*</span></label>
+                            <input type="text" id="nomeEmpresa" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>CNPJ</label>
+                            <input type="text" id="cnpj">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Data de Abertura da Empresa</label>
+                            <input type="date" id="dataAbertura">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fase <span class="required">*</span></label>
+                            <select id="fase" required>
+                                <option value="">-- Selecione a fase --</option>
+                                <option value="atendimento">Atendimento Inicial</option>
+                                <option value="planejamento">Planejamento</option>
+                                <option value="documentacao">Documentação</option>
+                                <option value="analise">Análise</option>
+                                <option value="formalizacao">Formalização</option>
+                                <option value="entrega">Entrega</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Orçamento (R$) <span class="required">*</span></label>
+                            <input type="number" id="orcamento" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Honorários Mensais (R$) <span class="required">*</span></label>
+                            <input type="number" id="honorarios" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Data</label>
+                            <input type="date" id="data">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Administrador <span class="required">*</span></label>
+                            <input type="text" id="administrador" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Telefone <span class="required">*</span></label>
+                            <input type="tel" id="telefone" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="email">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status do Processo <span class="required">*</span></label>
+                            <select id="status" required>
+                                <option value="">-- Selecione o Status --</option>
+                                <option value="prospeccao">Prospecção</option>
+                                <option value="documentacao">Documentação em Andamento</option>
+                                <option value="processamento">Processamento</option>
+                                <option value="conclusao">Conclusão</option>
+                                <option value="faturamento">Faturamento</option>
+                                <option value="encerrado">Encerrado</option>
+                            </select>
+                        </div>
+
+                        <!-- CHECKLIST -->
+                        <div class="checklist-section">
+                            <label style="font-weight: 600; margin-bottom: 8px; display: block;">📋 Checklist de Atividades</label>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_junta" name="junta">
+                                <label for="chk_junta">JUNTA COMERCIAL</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_receita" name="receita">
+                                <label for="chk_receita">RECEITA FEDERAL</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_cnpj" name="cnpj_reg">
+                                <label for="chk_cnpj">GERAÇÃO DO CNPJ</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_simples" name="simples">
+                                <label for="chk_simples">OPÇÃO SIMPLES NACIONAL</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_xerox" name="xerox">
+                                <label for="chk_xerox">XEROX DO CONTRATO</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_procuracao" name="procuracao">
+                                <label for="chk_procuracao">PROCURAÇÃO</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_questor" name="questor">
+                                <label for="chk_questor">QUESTOR</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_alvara" name="alvara">
+                                <label for="chk_alvara">ALVARÁ PREFEITURA</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_vigilancia" name="vigilancia">
+                                <label for="chk_vigilancia">VIGILÂNCIA SANITÁRIA</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_conselho" name="conselho">
+                                <label for="chk_conselho">CONSELHO REGIONAL</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_ficha" name="ficha">
+                                <label for="chk_ficha">FICHA HONORÁRIOS</label>
+                            </div>
+                            <div class="checklist-item">
+                                <input type="checkbox" id="chk_contrato" name="contrato">
+                                <label for="chk_contrato">CONTRATO SERVIÇOS CONTÁBEIS</label>
+                            </div>
+                        </div>
+
+                        <div class="btn-group">
+                            <button type="submit" class="btn-save">💾 Salvar Processo</button>
+                            <button type="reset" class="btn-reset">🔄 Limpar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- LISTA DE PROCESSOS -->
+                <div class="card">
+                    <h2>📝 Processos Registrados</h2>
+                    <div id="listaSocietario"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTÁBIL -->
+        <section id="contabil" class="section">
+            <div class="header">
+                <h1>📊 CONTÁBIL</h1>
+                <p>Balancetes • Demonstrações Financeiras • Escrituração Fiscal</p>
+            </div>
+
+            <div id="alertaContabil" class="alert"></div>
+
+            <div class="content-grid full-width">
+                <!-- PROCESSOS DISPONÍVEIS DO SOCIETÁRIO -->
+                <div class="card">
+                    <h2>📋 Todos os Processos (Societário)</h2>
+                    <div id="listaProcessosSocietario"></div>
+                </div>
+
+                <!-- NOVO REGISTRO -->
+                <div class="card">
+                    <h2>✏️ Novo Registro</h2>
+
+                    <form id="formContabil">
+                        <div class="form-group">
+                            <label>Vínculo com Processo Societário</label>
+                            <select id="cont_processo_id" onchange="preencherDadosSocietario(this.value, 'cont')">
+                                <option value="">-- Selecionar Processo (opcional) --</option>
+                            </select>
+                        </div>
+
+                        <div style="background-color: #F5ECED; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none;" id="cont_dadosSocietario">
+                            <div class="form-group">
+                                <label>Empresa (Societário)</label>
+                                <input type="text" id="cont_nomeEmpresa" readonly style="background-color: #e8ddd8; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>CNPJ (Societário)</label>
+                                <input type="text" id="cont_cnpj" readonly style="background-color: #e8ddd8; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>Data Abertura (Societário)</label>
+                                <input type="text" id="cont_dataAbertura" readonly style="background-color: #e8ddd8; cursor: not-allowed;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cliente <span class="required">*</span></label>
+                            <input type="text" id="cont_cliente" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Período (Mês/Ano) <span class="required">*</span></label>
+                            <input type="text" id="cont_periodo" placeholder="MM/YYYY" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Serviço <span class="required">*</span></label>
+                            <select id="cont_tipo" required>
+                                <option value="">-- Selecione --</option>
+                                <option>Entrega de obrigações acessórias</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descrever qual foi a obrigação <span class="required">*</span></label>
+                            <textarea id="cont_descricao_obrigacao" rows="2" required placeholder="Ex: ECF, DARF, DCTF, Folha, eSocial, FGTS, etc."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ciência de Entrada ou Alteração de Empresa</label>
+                            <select id="cont_ciencia">
+                                <option value="">-- Selecione --</option>
+                                <option value="entrada">Entrada de Empresa Nova</option>
+                                <option value="alteracao">Alteração de Dados</option>
+                                <option value="nenhuma">Sem alteração</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Reunião</label>
+                            <input type="date" id="cont_reuniao">
+                        </div>
+                        <div class="form-group">
+                            <label>Pendências</label>
+                            <textarea id="cont_pendencias" rows="3"></textarea>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn-save">💾 Registrar</button>
+                            <button type="reset" class="btn-reset">🔄 Limpar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📋 Registros Contábeis</h2>
+                    <div id="listaContabil"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FISCAL -->
+        <section id="fiscal" class="section">
+            <div class="header">
+                <h1>💰 FISCAL</h1>
+            </div>
+
+            <div id="alertaFiscal" class="alert"></div>
+
+            <div class="content-grid full-width">
+                <!-- PROCESSOS DISPONÍVEIS DO SOCIETÁRIO -->
+                <div class="card">
+                    <h2>📋 Todos os Processos (Societário)</h2>
+                    <div id="listaProcessosSocietarioFiscal"></div>
+                </div>
+
+                <!-- NOVO REGISTRO -->
+                <div class="card">
+                    <h2>✏️ Novo Registro</h2>
+
+                    <form id="formFiscal">
+                        <div class="form-group">
+                            <label>Vínculo com Processo Societário</label>
+                            <select id="fisc_processo_id" onchange="preencherDadosSocietario(this.value, 'fisc')">
+                                <option value="">-- Selecionar Processo (opcional) --</option>
+                            </select>
+                        </div>
+
+                        <div style="background-color: #F5ECED; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none;" id="fisc_dadosSocietario">
+                            <div class="form-group">
+                                <label>Empresa (Societário)</label>
+                                <input type="text" id="fisc_nomeEmpresa" readonly style="background-color: #e8ddd8; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>CNPJ (Societário)</label>
+                                <input type="text" id="fisc_cnpj" readonly style="background-color: #e8ddd8; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>Data Abertura (Societário)</label>
+                                <input type="text" id="fisc_dataAbertura" readonly style="background-color: #e8ddd8; cursor: not-allowed;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Cliente <span class="required">*</span></label>
+                            <input type="text" id="fisc_cliente" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Período <span class="required">*</span></label>
+                            <input type="text" id="fisc_periodo" placeholder="MM/YYYY" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Apuração <span class="required">*</span></label>
+                            <select id="fisc_tipo" required>
+                                <option value="">-- Selecione --</option>
+                                <option>Entrega de obrigações acessórias</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descrever qual foi a obrigação <span class="required">*</span></label>
+                            <textarea id="fisc_descricao_obrigacao" rows="2" required placeholder="Ex: ECF, DARF, DCTF, Declaração de Faturamento, etc."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ciência de Entrada ou Alteração de Empresa</label>
+                            <select id="fisc_ciencia">
+                                <option value="">-- Selecione --</option>
+                                <option value="entrada">Entrada de Empresa Nova</option>
+                                <option value="alteracao">Alteração de Dados</option>
+                                <option value="nenhuma">Sem alteração</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Reunião</label>
+                            <input type="date" id="fisc_reuniao">
+                        </div>
+                        <div class="form-group">
+                            <label>Pendências</label>
+                            <textarea id="fisc_pendencias" rows="3"></textarea>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn-save">💾 Registrar</button>
+                            <button type="reset" class="btn-reset">🔄 Limpar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📋 Registros Fiscais</h2>
+                    <div id="listaFiscal"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PESSOAL -->
+        <section id="pessoal" class="section">
+            <div class="header">
+                <h1>👥 PESSOAL</h1>
+                <p>Folha de Pagamento • eSocial • FGTS • Rescisões</p>
+            </div>
+
+            <div id="alertaPessoal" class="alert"></div>
+
+            <div class="content-grid full-width">
+                <!-- PROCESSOS DISPONÍVEIS DO SOCIETÁRIO -->
+                <div class="card">
+                    <h2>📋 Todos os Processos (Societário)</h2>
+                    <div id="listaProcessosSocietarioPessoal"></div>
+                </div>
+
+                <!-- NOVO REGISTRO -->
+                <div class="card">
+                    <h2>✏️ Novo Registro</h2>
+
+                    <form id="formPessoal">
+                        <div class="form-group">
+                            <label>Vínculo com Processo Societário</label>
+                            <select id="pess_processo_id" onchange="preencherDadosSocietario(this.value, 'pess')">
+                                <option value="">-- Selecionar Processo (opcional) --</option>
+                            </select>
+                        </div>
+
+                        <div style="background-color: #F5ECED; padding: 10px; border-radius: 4px; margin-bottom: 15px; display: none;" id="pess_dadosSocietario">
+                            <div class="form-group">
+                                <label>Empresa (Societário)</label>
+                                <input type="text" id="pess_nomeEmpresa" readonly style="background-color: #e8ddd8; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>CNPJ (Societário)</label>
+                                <input type="text" id="pess_cnpj" readonly style="background-color: #e8ddd8; cursor: not-allowed;">
+                            </div>
+                            <div class="form-group">
+                                <label>Data Abertura (Societário)</label>
+                                <input type="text" id="pess_dataAbertura" readonly style="background-color: #e8ddd8; cursor: not-allowed;">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Empresa <span class="required">*</span></label>
+                            <input type="text" id="pess_empresa" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Período (Mês/Ano) <span class="required">*</span></label>
+                            <input type="text" id="pess_periodo" placeholder="MM/YYYY" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo de Serviço <span class="required">*</span></label>
+                            <select id="pess_tipo" required>
+                                <option value="">-- Selecione --</option>
+                                <option>Entrega de obrigações acessórias</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Descrever qual foi a obrigação <span class="required">*</span></label>
+                            <textarea id="pess_descricao_obrigacao" rows="2" required placeholder="Ex: Folha de Pagamento, eSocial, FGTS, GFIP, etc."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ciência de Entrada ou Alteração de Empresa</label>
+                            <select id="pess_ciencia">
+                                <option value="">-- Selecione --</option>
+                                <option value="entrada">Entrada de Empresa Nova</option>
+                                <option value="alteracao">Alteração de Dados</option>
+                                <option value="nenhuma">Sem alteração</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Número de Funcionários <span class="required">*</span></label>
+                            <input type="number" id="pess_funcionarios" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Reunião</label>
+                            <input type="date" id="pess_reuniao">
+                        </div>
+                        <div class="form-group">
+                            <label>Pendências</label>
+                            <textarea id="pess_pendencias" rows="3"></textarea>
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn-save">💾 Registrar</button>
+                            <button type="reset" class="btn-reset">🔄 Limpar</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📋 Registros de Pessoal</h2>
+                    <div id="listaPessoal"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- USUÁRIOS -->
+        <section id="usuarios" class="section">
+            <div class="header">
+                <h1>👤 USUÁRIOS</h1>
+                <p>Gerenciamento de Usuários do Sistema</p>
+            </div>
+
+            <div id="alertaUsuarios" class="alert"></div>
+
+            <div class="content-grid">
+                <!-- FORMULÁRIO -->
+                <div class="card">
+                    <h2>✏️ Novo Usuário</h2>
+                    <form id="formUsuarios" onsubmit="salvarUsuario(event)">
+                        <div class="form-group">
+                            <label>Nome Completo <span class="required">*</span></label>
+                            <input type="text" id="usu_nome" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email <span class="required">*</span></label>
+                            <input type="email" id="usu_email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Senha <span class="required">*</span></label>
+                            <input type="password" id="usu_senha" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone</label>
+                            <input type="tel" id="usu_telefone">
+                        </div>
+                        <div class="form-group">
+                            <label>Papel/Função <span class="required">*</span></label>
+                            <select id="usu_papel" required>
+                                <option value="">-- Selecione --</option>
+                                <option value="admin">Administrador</option>
+                                <option value="contador">Contador</option>
+                                <option value="operacional">Operacional</option>
+                                <option value="visualizacao">Visualização</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-save" style="width: 100%;">💾 Cadastrar Usuário</button>
+                    </form>
+                </div>
+
+                <!-- LISTA DE USUÁRIOS -->
+                <div class="card">
+                    <h2>📋 Usuários Cadastrados</h2>
+                    <div id="listaUsuarios"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AUDITORIA -->
+        <section id="auditoria" class="section">
+            <div class="header">
+                <h1>📈 AUDITORIA</h1>
+                <p>Rastreamento de Alterações no Sistema</p>
+            </div>
+            <div class="card">
+                <h2>Log de Auditoria</h2>
+                <p style="color: #666; font-size: 12px; padding: 20px 0;">Funcionalidade em desenvolvimento.</p>
+            </div>
+        </section>
+
+        <!-- BACKUP -->
+        <section id="backup" class="section">
+            <div class="header">
+                <h1>💾 BACKUP</h1>
+                <p>Gerenciamento de Dados</p>
+            </div>
+            <div class="card">
+                <h2>Backup de Dados</h2>
+                <button class="btn-save" onclick="fazerBackup()" style="width: auto; margin-top: 15px;">📥 Baixar Backup JSON</button>
+                <p style="color: #666; font-size: 12px; margin-top: 15px;">Faça download de todos os dados (4 setores)</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO SOCIETÁRIO -->
+    <div id="modalEditSocietario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Editar Processo Societário</div>
+            <div id="formEditSocietario"></div>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="salvarEdicaoSocietario()">💾 Salvar</button>
+                <button class="btn-reset" onclick="fecharModal('modalEditSocietario')">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO CONTÁBIL -->
+    <div id="modalEditContabil" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Editar Registro Contábil</div>
+            <div id="formEditContabil"></div>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="salvarEdicaoContabil()">💾 Salvar</button>
+                <button class="btn-reset" onclick="fecharModal('modalEditContabil')">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO FISCAL -->
+    <div id="modalEditFiscal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Editar Registro Fiscal</div>
+            <div id="formEditFiscal"></div>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="salvarEdicaoFiscal()">💾 Salvar</button>
+                <button class="btn-reset" onclick="fecharModal('modalEditFiscal')">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO PESSOAL -->
+    <div id="modalEditPessoal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Editar Registro Pessoal</div>
+            <div id="formEditPessoal"></div>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="salvarEdicaoPessoal()">💾 Salvar</button>
+                <button class="btn-reset" onclick="fecharModal('modalEditPessoal')">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO USUÁRIOS -->
+    <div id="modalEditUsuarios" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Editar Usuário</div>
+            <div id="formEditUsuarios"></div>
+            <div class="modal-buttons">
+                <button class="btn-save" onclick="salvarEdicaoUsuario()">💾 Salvar</button>
+                <button class="btn-reset" onclick="fecharModal('modalEditUsuarios')">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DADOS GLOBAIS
+        let dados = {
+            societario: JSON.parse(localStorage.getItem('dados_societario')) || [],
+            contabil: JSON.parse(localStorage.getItem('dados_contabil')) || [],
+            fiscal: JSON.parse(localStorage.getItem('dados_fiscal')) || [],
+            pessoal: JSON.parse(localStorage.getItem('dados_pessoal')) || [],
+            usuarios: JSON.parse(localStorage.getItem('dados_usuarios')) || []
+        };
+
+        // INICIALIZAÇÃO
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('formSocietario').addEventListener('submit', salvarSocietario);
+            document.getElementById('formContabil').addEventListener('submit', salvarContabil);
+            document.getElementById('formFiscal').addEventListener('submit', salvarFiscal);
+            document.getElementById('formPessoal').addEventListener('submit', salvarPessoal);
+            document.getElementById('formUsuarios').addEventListener('submit', salvarUsuario);
+
+            renderizarTodos();
+            verificarLogin();
+        });
+
+        // NAVEGAÇÃO
+        function abrirSecao(secao) {
+            // Verificar permissão para Societário
+            if (secao === 'societario') {
+                const papel = sessionStorage.getItem('usuarioPapel');
+                if (papel === 'operacional') {
+                    mostrarAlerta('❌ Você não tem acesso ao módulo Societário!', 'alertaSocietario', 'error');
+                    return;
+                }
+            }
+            
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(secao).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // ============ SOCIETÁRIO ============
+        function salvarSocietario(e) {
+            e.preventDefault();
+
+            const processo = {
+                id: Date.now(),
+                nomeEmpresa: document.getElementById('nomeEmpresa').value,
+                cnpj: document.getElementById('cnpj').value || '-',
+                dataAbertura: document.getElementById('dataAbertura').value || '-',
+                fase: document.getElementById('fase').value,
+                status: document.getElementById('status').value,
+                orcamento: parseFloat(document.getElementById('orcamento').value),
+                honorarios: parseFloat(document.getElementById('honorarios').value),
+                data: document.getElementById('data').value || new Date().toISOString().split('T')[0],
+                administrador: document.getElementById('administrador').value,
+                telefone: document.getElementById('telefone').value,
+                email: document.getElementById('email').value || '-',
+                checklist: {
+                    junta: document.getElementById('chk_junta').checked,
+                    receita: document.getElementById('chk_receita').checked,
+                    cnpj_reg: document.getElementById('chk_cnpj').checked,
+                    simples: document.getElementById('chk_simples').checked,
+                    xerox: document.getElementById('chk_xerox').checked,
+                    procuracao: document.getElementById('chk_procuracao').checked,
+                    questor: document.getElementById('chk_questor').checked,
+                    alvara: document.getElementById('chk_alvara').checked,
+                    vigilancia: document.getElementById('chk_vigilancia').checked,
+                    conselho: document.getElementById('chk_conselho').checked,
+                    ficha: document.getElementById('chk_ficha').checked,
+                    contrato: document.getElementById('chk_contrato').checked
+                },
+                dataCriacao: new Date().toLocaleString('pt-BR')
+            };
+
+            dados.societario.push(processo);
+            localStorage.setItem('dados_societario', JSON.stringify(dados.societario));
+
+            mostrarAlerta('✅ Processo salvo com sucesso!', 'alertaSocietario', 'success');
+            document.getElementById('formSocietario').reset();
+            renderizarSocietario();
+            renderizarProcessosDisponiveisContabil();
+            renderizarProcessosDisponiveisFiscal();
+            renderizarProcessosDisponiveisPessoal();
+        }
+
+        function renderizarSocietario() {
+            const container = document.getElementById('listaSocietario');
+            if (dados.societario.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum processo registrado.</div>';
+                return;
+            }
+
+            const statusLabels = {
+                'prospeccao': 'Prospecção',
+                'documentacao': 'Documentação',
+                'processamento': 'Processamento',
+                'conclusao': 'Conclusão',
+                'faturamento': 'Faturamento',
+                'encerrado': 'Encerrado'
+            };
+
+            let html = '<table><thead><tr><th>Empresa</th><th>CNPJ</th><th>Data Abertura</th><th>Status</th><th>Fase</th><th>Ações</th></tr></thead><tbody>';
+            dados.societario.forEach(proc => {
+                const statusLabel = statusLabels[proc.status] || proc.status;
+                const dataAbertura = proc.dataAbertura !== '-' ? new Date(proc.dataAbertura).toLocaleDateString('pt-BR') : '-';
+                html += `<tr>
+                    <td><strong>${proc.nomeEmpresa}</strong></td>
+                    <td style="font-size: 11px;">${proc.cnpj}</td>
+                    <td style="font-size: 11px;">${dataAbertura}</td>
+                    <td><span style="background-color: #0D3B66; color: white; padding: 3px 8px; border-radius: 3px; font-size: 10px;">${statusLabel}</span></td>
+                    <td>${proc.fase}</td>
+                    <td>
+                        <button class="btn-small" onclick="abrirEdicaoSocietario(${proc.id})">✏️</button>
+                        <button class="btn-small btn-delete" onclick="deletarSocietario(${proc.id})">🗑️</button>
+                    </td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function abrirEdicaoSocietario(id) {
+            const proc = dados.societario.find(p => p.id === id);
+            const checkCompleto = Object.values(proc.checklist).filter(v => v).length;
+            const totalCheck = Object.keys(proc.checklist).length;
+
+            let html = `
+                <div style="margin-bottom: 15px; padding: 10px; background-color: #F5ECED; border-radius: 4px; font-size: 11px;">
+                    <strong>Checklist:</strong> ${checkCompleto}/${totalCheck} ✓
+                </div>
+                <form>
+                    <div class="form-group">
+                        <label>Nome da Empresa</label>
+                        <input type="text" id="edit_nomeEmpresa" value="${proc.nomeEmpresa}">
+                    </div>
+                    <div class="form-group">
+                        <label>CNPJ</label>
+                        <input type="text" id="edit_cnpj" value="${proc.cnpj}">
+                    </div>
+                    <div class="form-group">
+                        <label>Data de Abertura da Empresa</label>
+                        <input type="date" id="edit_dataAbertura" value="${proc.dataAbertura !== '-' ? proc.dataAbertura : ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>Fase</label>
+                        <select id="edit_fase">
+                            <option value="atendimento" ${proc.fase === 'atendimento' ? 'selected' : ''}>Atendimento</option>
+                            <option value="planejamento" ${proc.fase === 'planejamento' ? 'selected' : ''}>Planejamento</option>
+                            <option value="documentacao" ${proc.fase === 'documentacao' ? 'selected' : ''}>Documentação</option>
+                            <option value="analise" ${proc.fase === 'analise' ? 'selected' : ''}>Análise</option>
+                            <option value="formalizacao" ${proc.fase === 'formalizacao' ? 'selected' : ''}>Formalização</option>
+                            <option value="entrega" ${proc.fase === 'entrega' ? 'selected' : ''}>Entrega</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status do Processo</label>
+                        <select id="edit_status">
+                            <option value="prospeccao" ${proc.status === 'prospeccao' ? 'selected' : ''}>Prospecção</option>
+                            <option value="documentacao" ${proc.status === 'documentacao' ? 'selected' : ''}>Documentação em Andamento</option>
+                            <option value="processamento" ${proc.status === 'processamento' ? 'selected' : ''}>Processamento</option>
+                            <option value="conclusao" ${proc.status === 'conclusao' ? 'selected' : ''}>Conclusão</option>
+                            <option value="faturamento" ${proc.status === 'faturamento' ? 'selected' : ''}>Faturamento</option>
+                            <option value="encerrado" ${proc.status === 'encerrado' ? 'selected' : ''}>Encerrado</option>
+                        </select>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <label style="font-weight: 600; display: block; margin-bottom: 8px;">Checklist:</label>
+            `;
+
+            const items = [
+                {id: 'junta', label: 'Junta Comercial'},
+                {id: 'receita', label: 'Receita Federal'},
+                {id: 'cnpj_reg', label: 'Geração do CNPJ'},
+                {id: 'simples', label: 'Opção Simples'},
+                {id: 'xerox', label: 'Xerox Contrato'},
+                {id: 'procuracao', label: 'Procuração'},
+                {id: 'questor', label: 'Questor'},
+                {id: 'alvara', label: 'Alvará'},
+                {id: 'vigilancia', label: 'Vigilância'},
+                {id: 'conselho', label: 'Conselho'},
+                {id: 'ficha', label: 'Ficha Honorários'},
+                {id: 'contrato', label: 'Contrato Serviços'}
+            ];
+
+            items.forEach(item => {
+                const checked = proc.checklist[item.id] ? 'checked' : '';
+                html += `
+                    <div class="checklist-item">
+                        <input type="checkbox" id="edit_chk_${item.id}" ${checked}>
+                        <label for="edit_chk_${item.id}">${item.label}</label>
+                    </div>
+                `;
+            });
+
+            html += `</div></form>`;
+            document.getElementById('formEditSocietario').innerHTML = html;
+            window.idSocietarioEdit = id;
+            document.getElementById('modalEditSocietario').style.display = 'block';
+        }
+
+        function salvarEdicaoSocietario() {
+            const proc = dados.societario.find(p => p.id === window.idSocietarioEdit);
+            proc.nomeEmpresa = document.getElementById('edit_nomeEmpresa').value;
+            proc.cnpj = document.getElementById('edit_cnpj').value;
+            proc.dataAbertura = document.getElementById('edit_dataAbertura').value || '-';
+            proc.fase = document.getElementById('edit_fase').value;
+            proc.status = document.getElementById('edit_status').value;
+
+            ['junta', 'receita', 'cnpj_reg', 'simples', 'xerox', 'procuracao', 'questor', 'alvara', 'vigilancia', 'conselho', 'ficha', 'contrato'].forEach(item => {
+                proc.checklist[item] = document.getElementById(`edit_chk_${item}`).checked;
+            });
+
+            localStorage.setItem('dados_societario', JSON.stringify(dados.societario));
+            mostrarAlerta('✅ Processo atualizado!', 'alertaSocietario', 'success');
+            fecharModal('modalEditSocietario');
+            renderizarSocietario();
+            renderizarProcessosDisponiveisContabil();
+            renderizarProcessosDisponiveisFiscal();
+            renderizarProcessosDisponiveisPessoal();
+        }
+
+        function deletarSocietario(id) {
+            if (confirm('Tem certeza?')) {
+                dados.societario = dados.societario.filter(p => p.id !== id);
+                localStorage.setItem('dados_societario', JSON.stringify(dados.societario));
+                renderizarSocietario();
+                renderizarProcessosDisponiveisContabil();
+                renderizarProcessosDisponiveisFiscal();
+                renderizarProcessosDisponiveisPessoal();
+            }
+        }
+
+        function abrirEdicaoContabil(id) {
+            const reg = dados.contabil.find(r => r.id === id);
+            window.idContabilEdit = id;
+            let html = `
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <input type="text" id="edit_cont_cliente" value="${reg.cliente}" required>
+                </div>
+                <div class="form-group">
+                    <label>Período</label>
+                    <input type="text" id="edit_cont_periodo" value="${reg.periodo}" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrever qual foi a obrigação</label>
+                    <textarea id="edit_cont_descricao_obrigacao" rows="2" required>${reg.descricaoObrigacao}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Ciência de Entrada ou Alteração de Empresa</label>
+                    <select id="edit_cont_ciencia">
+                        <option value="">-- Selecione --</option>
+                        <option value="entrada" ${reg.ciencia === 'entrada' ? 'selected' : ''}>Entrada de Empresa Nova</option>
+                        <option value="alteracao" ${reg.ciencia === 'alteracao' ? 'selected' : ''}>Alteração de Dados</option>
+                        <option value="nenhuma" ${reg.ciencia === 'nenhuma' ? 'selected' : ''}>Sem alteração</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reunião</label>
+                    <input type="date" id="edit_cont_reuniao" value="${reg.reuniao}">
+                </div>
+                <div class="form-group">
+                    <label>Pendências</label>
+                    <textarea id="edit_cont_pendencias" rows="2">${reg.pendencias}</textarea>
+                </div>
+            `;
+            document.getElementById('formEditContabil').innerHTML = html;
+            document.getElementById('modalEditContabil').style.display = 'flex';
+        }
+
+        function salvarEdicaoContabil() {
+            const reg = dados.contabil.find(r => r.id === window.idContabilEdit);
+            reg.cliente = document.getElementById('edit_cont_cliente').value;
+            reg.periodo = document.getElementById('edit_cont_periodo').value;
+            reg.descricaoObrigacao = document.getElementById('edit_cont_descricao_obrigacao').value;
+            reg.ciencia = document.getElementById('edit_cont_ciencia').value || '-';
+            reg.reuniao = document.getElementById('edit_cont_reuniao').value;
+            reg.pendencias = document.getElementById('edit_cont_pendencias').value;
+            localStorage.setItem('dados_contabil', JSON.stringify(dados.contabil));
+            mostrarAlerta('✅ Registro atualizado!', 'alertaContabil', 'success');
+            fecharModal('modalEditContabil');
+            renderizarContabil();
+        }
+
+        function deletarContabil(id) {
+            if (confirm('Tem certeza?')) {
+                dados.contabil = dados.contabil.filter(r => r.id !== id);
+                localStorage.setItem('dados_contabil', JSON.stringify(dados.contabil));
+                renderizarContabil();
+            }
+        }
+
+        function abrirEdicaoFiscal(id) {
+            const reg = dados.fiscal.find(r => r.id === id);
+            window.idFiscalEdit = id;
+            let html = `
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <input type="text" id="edit_fisc_cliente" value="${reg.cliente}" required>
+                </div>
+                <div class="form-group">
+                    <label>Período</label>
+                    <input type="text" id="edit_fisc_periodo" value="${reg.periodo}" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrever qual foi a obrigação</label>
+                    <textarea id="edit_fisc_descricao_obrigacao" rows="2" required>${reg.descricaoObrigacao}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Ciência de Entrada ou Alteração de Empresa</label>
+                    <select id="edit_fisc_ciencia">
+                        <option value="">-- Selecione --</option>
+                        <option value="entrada" ${reg.ciencia === 'entrada' ? 'selected' : ''}>Entrada de Empresa Nova</option>
+                        <option value="alteracao" ${reg.ciencia === 'alteracao' ? 'selected' : ''}>Alteração de Dados</option>
+                        <option value="nenhuma" ${reg.ciencia === 'nenhuma' ? 'selected' : ''}>Sem alteração</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Reunião</label>
+                    <input type="date" id="edit_fisc_reuniao" value="${reg.reuniao}">
+                </div>
+                <div class="form-group">
+                    <label>Pendências</label>
+                    <textarea id="edit_fisc_pendencias" rows="2">${reg.pendencias}</textarea>
+                </div>
+            `;
+            document.getElementById('formEditFiscal').innerHTML = html;
+            document.getElementById('modalEditFiscal').style.display = 'flex';
+        }
+
+        function salvarEdicaoFiscal() {
+            const reg = dados.fiscal.find(r => r.id === window.idFiscalEdit);
+            reg.cliente = document.getElementById('edit_fisc_cliente').value;
+            reg.periodo = document.getElementById('edit_fisc_periodo').value;
+            reg.descricaoObrigacao = document.getElementById('edit_fisc_descricao_obrigacao').value;
+            reg.ciencia = document.getElementById('edit_fisc_ciencia').value || '-';
+            reg.reuniao = document.getElementById('edit_fisc_reuniao').value;
+            reg.pendencias = document.getElementById('edit_fisc_pendencias').value;
+            localStorage.setItem('dados_fiscal', JSON.stringify(dados.fiscal));
+            mostrarAlerta('✅ Registro atualizado!', 'alertaFiscal', 'success');
+            fecharModal('modalEditFiscal');
+            renderizarFiscal();
+        }
+
+        function deletarFiscal(id) {
+            if (confirm('Tem certeza?')) {
+                dados.fiscal = dados.fiscal.filter(r => r.id !== id);
+                localStorage.setItem('dados_fiscal', JSON.stringify(dados.fiscal));
+                renderizarFiscal();
+            }
+        }
+
+        function abrirEdicaoPessoal(id) {
+            const reg = dados.pessoal.find(r => r.id === id);
+            window.idPessoalEdit = id;
+            let html = `
+                <div class="form-group">
+                    <label>Empresa</label>
+                    <input type="text" id="edit_pess_empresa" value="${reg.empresa}" required>
+                </div>
+                <div class="form-group">
+                    <label>Período</label>
+                    <input type="text" id="edit_pess_periodo" value="${reg.periodo}" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrever qual foi a obrigação</label>
+                    <textarea id="edit_pess_descricao_obrigacao" rows="2" required>${reg.descricaoObrigacao}</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Ciência de Entrada ou Alteração de Empresa</label>
+                    <select id="edit_pess_ciencia">
+                        <option value="">-- Selecione --</option>
+                        <option value="entrada" ${reg.ciencia === 'entrada' ? 'selected' : ''}>Entrada de Empresa Nova</option>
+                        <option value="alteracao" ${reg.ciencia === 'alteracao' ? 'selected' : ''}>Alteração de Dados</option>
+                        <option value="nenhuma" ${reg.ciencia === 'nenhuma' ? 'selected' : ''}>Sem alteração</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Funcionários</label>
+                    <input type="number" id="edit_pess_funcionarios" value="${reg.funcionarios}" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Reunião</label>
+                    <input type="date" id="edit_pess_reuniao" value="${reg.reuniao}">
+                </div>
+                <div class="form-group">
+                    <label>Pendências</label>
+                    <textarea id="edit_pess_pendencias" rows="2">${reg.pendencias}</textarea>
+                </div>
+            `;
+            document.getElementById('formEditPessoal').innerHTML = html;
+            document.getElementById('modalEditPessoal').style.display = 'flex';
+        }
+
+        function salvarEdicaoPessoal() {
+            const reg = dados.pessoal.find(r => r.id === window.idPessoalEdit);
+            reg.empresa = document.getElementById('edit_pess_empresa').value;
+            reg.periodo = document.getElementById('edit_pess_periodo').value;
+            reg.descricaoObrigacao = document.getElementById('edit_pess_descricao_obrigacao').value;
+            reg.ciencia = document.getElementById('edit_pess_ciencia').value || '-';
+            reg.funcionarios = document.getElementById('edit_pess_funcionarios').value;
+            reg.reuniao = document.getElementById('edit_pess_reuniao').value;
+            reg.pendencias = document.getElementById('edit_pess_pendencias').value;
+            localStorage.setItem('dados_pessoal', JSON.stringify(dados.pessoal));
+            mostrarAlerta('✅ Registro atualizado!', 'alertaPessoal', 'success');
+            fecharModal('modalEditPessoal');
+            renderizarPessoal();
+        }
+
+        function deletarPessoal(id) {
+            if (confirm('Tem certeza?')) {
+                dados.pessoal = dados.pessoal.filter(r => r.id !== id);
+                localStorage.setItem('dados_pessoal', JSON.stringify(dados.pessoal));
+                renderizarPessoal();
+            }
+        }
+
+        // ============ USUÁRIOS ============
+        function salvarUsuario(e) {
+            e.preventDefault();
+            const usuario = {
+                id: Date.now(),
+                nome: document.getElementById('usu_nome').value,
+                email: document.getElementById('usu_email').value,
+                senha: document.getElementById('usu_senha').value,
+                telefone: document.getElementById('usu_telefone').value,
+                papel: document.getElementById('usu_papel').value,
+                dataCriacao: new Date().toLocaleDateString('pt-BR')
+            };
+            dados.usuarios.push(usuario);
+            localStorage.setItem('dados_usuarios', JSON.stringify(dados.usuarios));
+            mostrarAlerta('✅ Usuário cadastrado!', 'alertaUsuarios', 'success');
+            document.getElementById('formUsuarios').reset();
+            renderizarUsuarios();
+        }
+
+        function renderizarUsuarios() {
+            const container = document.getElementById('listaUsuarios');
+            if (dados.usuarios.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum usuário cadastrado.</div>';
+                return;
+            }
+            let html = '<table><thead><tr><th>Nome</th><th>Email</th><th>Telefone</th><th>Papel</th><th>Data Criação</th><th>Ações</th></tr></thead><tbody>';
+            dados.usuarios.forEach(usu => {
+                const papelLabel = {
+                    'admin': 'Administrador',
+                    'contador': 'Contador',
+                    'operacional': 'Operacional',
+                    'visualizacao': 'Visualização'
+                }[usu.papel] || usu.papel;
+                html += `<tr><td>${usu.nome}</td><td style="font-size: 11px;">${usu.email}</td><td>${usu.telefone || '-'}</td><td><span style="background-color: #F5ECED; padding: 3px 8px; border-radius: 3px; font-size: 10px;">${papelLabel}</span></td><td>${usu.dataCriacao}</td><td><button class="btn-small" onclick="abrirEdicaoUsuario(${usu.id})">✏️</button><button class="btn-small btn-delete" onclick="deletarUsuario(${usu.id})">🗑️</button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function abrirEdicaoUsuario(id) {
+            const usu = dados.usuarios.find(u => u.id === id);
+            window.idUsuarioEdit = id;
+            let html = `
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" id="edit_usu_nome" value="${usu.nome}" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="edit_usu_email" value="${usu.email}" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="edit_usu_senha" value="${usu.senha}" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="tel" id="edit_usu_telefone" value="${usu.telefone || ''}">
+                </div>
+                <div class="form-group">
+                    <label>Papel/Função</label>
+                    <select id="edit_usu_papel">
+                        <option value="">-- Selecione --</option>
+                        <option value="admin" ${usu.papel === 'admin' ? 'selected' : ''}>Administrador</option>
+                        <option value="contador" ${usu.papel === 'contador' ? 'selected' : ''}>Contador</option>
+                        <option value="operacional" ${usu.papel === 'operacional' ? 'selected' : ''}>Operacional</option>
+                        <option value="visualizacao" ${usu.papel === 'visualizacao' ? 'selected' : ''}>Visualização</option>
+                    </select>
+                </div>
+            `;
+            document.getElementById('formEditUsuarios').innerHTML = html;
+            document.getElementById('modalEditUsuarios').style.display = 'flex';
+        }
+
+        function salvarEdicaoUsuario() {
+            const usu = dados.usuarios.find(u => u.id === window.idUsuarioEdit);
+            usu.nome = document.getElementById('edit_usu_nome').value;
+            usu.email = document.getElementById('edit_usu_email').value;
+            usu.senha = document.getElementById('edit_usu_senha').value;
+            usu.telefone = document.getElementById('edit_usu_telefone').value;
+            usu.papel = document.getElementById('edit_usu_papel').value;
+            localStorage.setItem('dados_usuarios', JSON.stringify(dados.usuarios));
+            mostrarAlerta('✅ Usuário atualizado!', 'alertaUsuarios', 'success');
+            fecharModal('modalEditUsuarios');
+            renderizarUsuarios();
+        }
+
+        function deletarUsuario(id) {
+            if (confirm('Tem certeza? Ao deletar o usuário, todos os seus dados será removidos.')) {
+                dados.usuarios = dados.usuarios.filter(u => u.id !== id);
+                localStorage.setItem('dados_usuarios', JSON.stringify(dados.usuarios));
+                renderizarUsuarios();
+            }
+        }
+
+        // ============ CONTÁBIL ============
+        function salvarContabil(e) {
+            e.preventDefault();
+            const registro = {
+                id: Date.now(),
+                processoSocietarioId: document.getElementById('cont_processo_id').value || null,
+                cliente: document.getElementById('cont_cliente').value,
+                periodo: document.getElementById('cont_periodo').value,
+                tipo: document.getElementById('cont_tipo').value,
+                descricaoObrigacao: document.getElementById('cont_descricao_obrigacao').value,
+                ciencia: document.getElementById('cont_ciencia').value || '-',
+                reuniao: document.getElementById('cont_reuniao').value,
+                pendencias: document.getElementById('cont_pendencias').value
+            };
+            dados.contabil.push(registro);
+            localStorage.setItem('dados_contabil', JSON.stringify(dados.contabil));
+            mostrarAlerta('✅ Registro salvo!', 'alertaContabil', 'success');
+            document.getElementById('formContabil').reset();
+            renderizarContabil();
+        }
+
+        function renderizarContabil() {
+            const container = document.getElementById('listaContabil');
+            if (dados.contabil.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum registro.</div>';
+                return;
+            }
+            let html = '<table><thead><tr><th>Cliente</th><th>Período</th><th>Obrigação</th><th>Ciência</th><th>Ações</th></tr></thead><tbody>';
+            dados.contabil.forEach(reg => {
+                const cienciaLabel = {
+                    'entrada': 'Entrada',
+                    'alteracao': 'Alteração',
+                    'nenhuma': 'Sem alteração',
+                    '-': '-'
+                }[reg.ciencia] || reg.ciencia;
+                html += `<tr><td>${reg.cliente}</td><td>${reg.periodo}</td><td style="font-size: 11px;">${reg.descricaoObrigacao}</td><td style="font-size: 11px;">${cienciaLabel}</td><td><button class="btn-small" onclick="abrirEdicaoContabil(${reg.id})">✏️</button><button class="btn-small btn-delete" onclick="deletarContabil(${reg.id})">🗑️</button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // ============ FISCAL ============
+        function salvarFiscal(e) {
+            e.preventDefault();
+            const registro = {
+                id: Date.now(),
+                processoSocietarioId: document.getElementById('fisc_processo_id').value || null,
+                cliente: document.getElementById('fisc_cliente').value,
+                periodo: document.getElementById('fisc_periodo').value,
+                tipo: document.getElementById('fisc_tipo').value,
+                descricaoObrigacao: document.getElementById('fisc_descricao_obrigacao').value,
+                ciencia: document.getElementById('fisc_ciencia').value || '-',
+                reuniao: document.getElementById('fisc_reuniao').value,
+                pendencias: document.getElementById('fisc_pendencias').value
+            };
+            dados.fiscal.push(registro);
+            localStorage.setItem('dados_fiscal', JSON.stringify(dados.fiscal));
+            mostrarAlerta('✅ Registro salvo!', 'alertaFiscal', 'success');
+            document.getElementById('formFiscal').reset();
+            renderizarFiscal();
+        }
+
+        function renderizarFiscal() {
+            const container = document.getElementById('listaFiscal');
+            if (dados.fiscal.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum registro.</div>';
+                return;
+            }
+            let html = '<table><thead><tr><th>Cliente</th><th>Período</th><th>Obrigação</th><th>Ciência</th><th>Ações</th></tr></thead><tbody>';
+            dados.fiscal.forEach(reg => {
+                const cienciaLabel = {
+                    'entrada': 'Entrada',
+                    'alteracao': 'Alteração',
+                    'nenhuma': 'Sem alteração',
+                    '-': '-'
+                }[reg.ciencia] || reg.ciencia;
+                html += `<tr><td>${reg.cliente}</td><td>${reg.periodo}</td><td style="font-size: 11px;">${reg.descricaoObrigacao}</td><td style="font-size: 11px;">${cienciaLabel}</td><td><button class="btn-small" onclick="abrirEdicaoFiscal(${reg.id})">✏️</button><button class="btn-small btn-delete" onclick="deletarFiscal(${reg.id})">🗑️</button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // ============ PESSOAL ============
+        function salvarPessoal(e) {
+            e.preventDefault();
+            const registro = {
+                id: Date.now(),
+                processoSocietarioId: document.getElementById('pess_processo_id').value || null,
+                empresa: document.getElementById('pess_empresa').value,
+                periodo: document.getElementById('pess_periodo').value,
+                tipo: document.getElementById('pess_tipo').value,
+                descricaoObrigacao: document.getElementById('pess_descricao_obrigacao').value,
+                ciencia: document.getElementById('pess_ciencia').value || '-',
+                funcionarios: document.getElementById('pess_funcionarios').value,
+                reuniao: document.getElementById('pess_reuniao').value,
+                pendencias: document.getElementById('pess_pendencias').value
+            };
+            dados.pessoal.push(registro);
+            localStorage.setItem('dados_pessoal', JSON.stringify(dados.pessoal));
+            mostrarAlerta('✅ Registro salvo!', 'alertaPessoal', 'success');
+            document.getElementById('formPessoal').reset();
+            renderizarPessoal();
+        }
+
+        function renderizarPessoal() {
+            const container = document.getElementById('listaPessoal');
+            if (dados.pessoal.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum registro.</div>';
+                return;
+            }
+            let html = '<table><thead><tr><th>Empresa</th><th>Período</th><th>Obrigação</th><th>Ciência</th><th>Funcionários</th><th>Ações</th></tr></thead><tbody>';
+            dados.pessoal.forEach(reg => {
+                const cienciaLabel = {
+                    'entrada': 'Entrada',
+                    'alteracao': 'Alteração',
+                    'nenhuma': 'Sem alteração',
+                    '-': '-'
+                }[reg.ciencia] || reg.ciencia;
+                html += `<tr><td>${reg.empresa}</td><td>${reg.periodo}</td><td style="font-size: 11px;">${reg.descricaoObrigacao}</td><td style="font-size: 11px;">${cienciaLabel}</td><td>${reg.funcionarios}</td><td><button class="btn-small" onclick="abrirEdicaoPessoal(${reg.id})">✏️</button><button class="btn-small btn-delete" onclick="deletarPessoal(${reg.id})">🗑️</button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // FUNÇÕES GERAIS
+        function renderizarTodos() {
+            renderizarSocietario();
+            renderizarContabil();
+            renderizarFiscal();
+            renderizarPessoal();
+            renderizarUsuarios();
+            renderizarProcessosDisponiveisContabil();
+            renderizarProcessosDisponiveisFiscal();
+            renderizarProcessosDisponiveisPessoal();
+        }
+
+        // ============ PROCESSOS DISPONÍVEIS PARA IMPORTAÇÃO ============
+        function renderizarProcessosDisponiveisContabil() {
+            const processosDisponiveis = dados.societario;
+            renderTablesProcessosDisponiveis(processosDisponiveis, 'listaProcessosSocietario');
+            atualizarSelectProcessos('cont_processo_id', processosDisponiveis);
+        }
+
+        function renderizarProcessosDisponiveisFiscal() {
+            const processosDisponiveis = dados.societario;
+            renderTablesProcessosDisponiveis(processosDisponiveis, 'listaProcessosSocietarioFiscal');
+            atualizarSelectProcessos('fisc_processo_id', processosDisponiveis);
+        }
+
+        function renderizarProcessosDisponiveisPessoal() {
+            const processosDisponiveis = dados.societario;
+            renderTablesProcessosDisponiveis(processosDisponiveis, 'listaProcessosSocietarioPessoal');
+            atualizarSelectProcessos('pess_processo_id', processosDisponiveis);
+        }
+
+        function atualizarSelectProcessos(selectId, processos) {
+            const select = document.getElementById(selectId);
+            if (!select) return;
+
+            // Manter a primeira opção vazia
+            const primeiraOpcao = select.options[0].outerHTML;
+            
+            // Limpar todas as opções
+            select.innerHTML = primeiraOpcao;
+            
+            // Adicionar novas opções
+            processos.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = `${p.nomeEmpresa} - ${p.administrador}`;
+                select.appendChild(option);
+            });
+        }
+
+        function renderTablesProcessosDisponiveis(processos, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (processos.length === 0) {
+                container.innerHTML = '<div class="empty-state">Nenhum processo disponível.</div>';
+                return;
+            }
+
+            const statusLabels = {
+                'prospeccao': 'Prospecção',
+                'documentacao': 'Documentação',
+                'processamento': 'Processamento',
+                'conclusao': 'Conclusão',
+                'faturamento': 'Faturamento',
+                'encerrado': 'Encerrado'
+            };
+
+            let html = '<table style="font-size: 11px;"><thead><tr><th>Empresa</th><th>CNPJ</th><th>Data Abertura</th><th>Status</th><th>Fase</th><th>Checklist</th></tr></thead><tbody>';
+            processos.forEach(proc => {
+                const checkCompleto = Object.values(proc.checklist).filter(v => v).length;
+                const totalCheck = Object.keys(proc.checklist).length;
+                const statusLabel = statusLabels[proc.status] || proc.status;
+                
+                let dataAbertura = '-';
+                if (proc.dataAbertura && proc.dataAbertura !== '-' && proc.dataAbertura.trim() !== '') {
+                    try {
+                        const date = new Date(proc.dataAbertura + 'T00:00:00');
+                        if (!isNaN(date.getTime())) {
+                            dataAbertura = date.toLocaleDateString('pt-BR');
+                        }
+                    } catch(e) {
+                        dataAbertura = proc.dataAbertura;
+                    }
+                }
+                
+                html += `<tr>
+                    <td><strong>${proc.nomeEmpresa}</strong></td>
+                    <td style="font-size: 10px;">${proc.cnpj}</td>
+                    <td style="font-size: 10px;">${dataAbertura}</td>
+                    <td style="color: #0D3B66; font-weight: 600; font-size: 10px;">${statusLabel}</td>
+                    <td style="font-size: 10px;">${proc.fase}</td>
+                    <td style="color: #0D3B66; font-weight: 600; font-size: 10px;">${checkCompleto}/${totalCheck}</td>
+                </tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // PREENCHIMENTO AUTOMÁTICO QUANDO SELECIONA PROCESSO
+        function preencherDadosSocietario(processoId, prefixoModulo) {
+            const bloco = document.getElementById(`${prefixoModulo}_dadosSocietario`);
+            
+            if (!processoId) {
+                // Limpar campos se deselecionar
+                document.getElementById(`${prefixoModulo}_nomeEmpresa`).value = '';
+                document.getElementById(`${prefixoModulo}_cnpj`).value = '';
+                document.getElementById(`${prefixoModulo}_dataAbertura`).value = '';
+                if (bloco) bloco.style.display = 'none';
+                return;
+            }
+
+            const processo = dados.societario.find(p => p.id == processoId);
+            if (!processo) return;
+
+            // Preencher campos automaticamente
+            document.getElementById(`${prefixoModulo}_nomeEmpresa`).value = processo.nomeEmpresa;
+            document.getElementById(`${prefixoModulo}_cnpj`).value = processo.cnpj;
+            
+            // Formatar e preencher data
+            let dataFormatada = '-';
+            if (processo.dataAbertura && processo.dataAbertura !== '-' && processo.dataAbertura.trim() !== '') {
+                try {
+                    const date = new Date(processo.dataAbertura + 'T00:00:00');
+                    if (!isNaN(date.getTime())) {
+                        dataFormatada = date.toLocaleDateString('pt-BR');
+                    }
+                } catch(e) {
+                    dataFormatada = processo.dataAbertura;
+                }
+            }
+            document.getElementById(`${prefixoModulo}_dataAbertura`).value = dataFormatada;
+            
+            // Mostrar bloco
+            if (bloco) bloco.style.display = 'block';
+        }
+
+        function mostrarAlerta(msg, el, tipo) {
+            const alert = document.getElementById(el);
+            if (!alert) return;
+            alert.textContent = msg;
+            alert.className = `alert ${tipo}`;
+            setTimeout(() => alert.className = 'alert', 4000);
+        }
+
+        // ============ LOGIN ============
+        function fazerLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const senha = document.getElementById('loginSenha').value;
+            
+            // Procurar usuário no localStorage
+            const usuarioEncontrado = dados.usuarios.find(u => u.email === email && u.senha === senha);
+            
+            if (usuarioEncontrado) {
+                // Salvar sessão
+                sessionStorage.setItem('usuarioLogado', usuarioEncontrado.nome);
+                sessionStorage.setItem('usuarioEmail', usuarioEncontrado.email);
+                sessionStorage.setItem('usuarioPapel', usuarioEncontrado.papel);
+                
+                // Atualizar nome na sidebar
+                document.getElementById('nomeUsuarioLogado').textContent = usuarioEncontrado.nome.split(' ')[0];
+                
+                // Controlar acesso ao Societário
+                controlarAcesso(usuarioEncontrado.papel);
+                
+                // Fechar tela de login
+                document.getElementById('telaLogin').classList.remove('ativo');
+                document.body.classList.remove('deslogado');
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginSenha').value = '';
+                
+                mostrarAlerta('✅ Bem-vindo(a), ' + usuarioEncontrado.nome + '!', 'alertaSocietario', 'success');
+            } else {
+                mostrarAlerta('❌ Email ou senha incorretos!', 'alertaSocietario', 'error');
+                document.getElementById('loginSenha').value = '';
+            }
+        }
+
+        function controlarAcesso(papel) {
+            const itemSocietario = document.getElementById('itemSocietario');
+            const secaoSocietario = document.getElementById('societario');
+            
+            if (papel === 'operacional') {
+                // Esconder Societário para operacionais
+                itemSocietario.style.display = 'none';
+                secaoSocietario.style.display = 'none';
+            } else {
+                // Mostrar para outros papéis
+                itemSocietario.style.display = 'block';
+                secaoSocietario.style.display = 'block';
+            }
+        }
+
+        function verificarLogin() {
+            const usuarioLogado = sessionStorage.getItem('usuarioLogado');
+            const usuarioPapel = sessionStorage.getItem('usuarioPapel');
+            
+            if (!usuarioLogado) {
+                // Mostrar tela de login
+                document.getElementById('telaLogin').classList.add('ativo');
+                document.body.classList.add('deslogado');
+            } else {
+                // Manter logado
+                document.getElementById('telaLogin').classList.remove('ativo');
+                document.body.classList.remove('deslogado');
+                document.getElementById('nomeUsuarioLogado').textContent = usuarioLogado.split(' ')[0];
+                
+                // Controlar acesso ao Societário
+                if (usuarioPapel) {
+                    controlarAcesso(usuarioPapel);
+                }
+            }
+        }
+
+        function fecharModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function logout() {
+            if (confirm('Deseja sair do sistema?')) {
+                sessionStorage.removeItem('usuarioLogado');
+                sessionStorage.removeItem('usuarioEmail');
+                sessionStorage.removeItem('usuarioPapel');
+                document.getElementById('telaLogin').classList.add('ativo');
+                document.body.classList.add('deslogado');
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginSenha').value = '';
+                mostrarAlerta('✅ Você foi desconectado!', 'alertaSocietario', 'success');
+            }
+        }
+
+        function fazerBackup() {
+            const backup = JSON.stringify(dados, null, 2);
+            const blob = new Blob([backup], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_agj_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
