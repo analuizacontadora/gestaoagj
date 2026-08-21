@@ -482,29 +482,7 @@
             border-top: 1px solid #eee;
         }
     </style>
-
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDmb_mCzw1fBBcWHwmAlN2xFOI-eDKN-9I",
-  authDomain: "agj-contabilidade.firebaseapp.com",
-  databaseURL: "https://agj-contabilidade-default-rtdb.firebaseio.com",
-  projectId: "agj-contabilidade",
-  storageBucket: "agj-contabilidade.firebasestorage.app",
-  messagingSenderId: "586326069475",
-  appId: "1:586326069475:web:2c228b397338ae956c75d6",
-  measurementId: "G-P06LVBS0QQ"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);</head>
+</head>
 <body>
     <!-- TELA DE LOGIN -->
     <div id="telaLogin" class="ativo">
@@ -1172,6 +1150,20 @@ const analytics = getAnalytics(app);</head>
 
     <script>
         // DADOS GLOBAIS
+        // Inicializar com usuário padrão se não existir nenhum
+        if (!localStorage.getItem('dados_usuarios')) {
+            const usuarioPadrao = [{
+                id: 1000,
+                nome: "Ana Luiza",
+                email: "ana@teste.com",
+                senha: "123456",
+                telefone: "(71) 99999-9999",
+                papel: "admin",
+                dataCriacao: "20/08/2026"
+            }];
+            localStorage.setItem('dados_usuarios', JSON.stringify(usuarioPadrao));
+        }
+
         let dados = {
             societario: JSON.parse(localStorage.getItem('dados_societario')) || [],
             contabil: JSON.parse(localStorage.getItem('dados_contabil')) || [],
