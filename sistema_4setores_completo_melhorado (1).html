@@ -1876,9 +1876,11 @@
                 return;
             }
 
-            // Verificar papel do usuário - FORÇA que operacional não veja
+            // TRIPLE-CHECK do papel do usuário
             const papelUsuario = sessionStorage.getItem('usuarioPapel');
-            const ehOperacional = (papelUsuario === 'operacional');
+            const ehOperacional = (papelUsuario === 'operacional' || papelUsuario === 'Operacional');
+            
+            console.log('🔍 DEBUG: Papel do usuário =', papelUsuario, '| ehOperacional =', ehOperacional);
 
             const statusLabels = {
                 'prospeccao': 'Prospecção',
@@ -1889,42 +1891,67 @@
                 'encerrado': 'Encerrado'
             };
 
-            // BLOQUEAR coluna de honorários para operacional
-            let colunaHonorarios = ehOperacional ? '' : '<th>Honorários</th>';
-            let html = `<table style="font-size: 11px;"><thead><tr><th>Empresa</th><th>CNPJ</th><th>Data Abertura</th><th>Status</th><th>Fase</th><th>Checklist</th>${colunaHonorarios}</tr></thead><tbody>`;
-            
-            processos.forEach(proc => {
-                const checkCompleto = Object.values(proc.checklist).filter(v => v).length;
-                const totalCheck = Object.keys(proc.checklist).length;
-                const statusLabel = statusLabels[proc.status] || proc.status;
-                
-                let dataAbertura = '-';
-                if (proc.dataAbertura && proc.dataAbertura !== '-' && proc.dataAbertura.trim() !== '') {
-                    try {
-                        const date = new Date(proc.dataAbertura + 'T00:00:00');
-                        if (!isNaN(date.getTime())) {
-                            dataAbertura = date.toLocaleDateString('pt-BR');
+            // SE FOR OPERACIONAL: NEM COLOCA COLUNA DE HONORÁRIOS
+            // SE NÃO FOR OPERACIONAL: COLOCA NORMALMENTE
+            let tabelaHTML = '';
+            if (ehOperacional) {
+                // OPERACIONAL: SEM COLUNA DE HONORÁRIOS
+                tabelaHTML = `<table style="font-size: 11px;"><thead><tr><th>Empresa</th><th>CNPJ</th><th>Data Abertura</th><th>Status</th><th>Fase</th><th>Checklist</th></tr></thead><tbody>`;
+                processos.forEach(proc => {
+                    const checkCompleto = Object.values(proc.checklist).filter(v => v).length;
+                    const totalCheck = Object.keys(proc.checklist).length;
+                    const statusLabel = statusLabels[proc.status] || proc.status;
+                    let dataAbertura = '-';
+                    if (proc.dataAbertura && proc.dataAbertura !== '-' && proc.dataAbertura.trim() !== '') {
+                        try {
+                            const date = new Date(proc.dataAbertura + 'T00:00:00');
+                            if (!isNaN(date.getTime())) {
+                                dataAbertura = date.toLocaleDateString('pt-BR');
+                            }
+                        } catch(e) {
+                            dataAbertura = proc.dataAbertura;
                         }
-                    } catch(e) {
-                        dataAbertura = proc.dataAbertura;
                     }
-                }
-                
-                // NUNCA mostra honorários para operacional
-                let valorHonorarios = ehOperacional ? '' : `<td style="font-size: 10px; color: #2d5016; font-weight: bold;">R$ ${proc.honorarios || '0,00'}</td>`;
-                
-                html += `<tr>
-                    <td><strong>${proc.nomeEmpresa}</strong></td>
-                    <td style="font-size: 10px;">${proc.cnpj}</td>
-                    <td style="font-size: 10px;">${dataAbertura}</td>
-                    <td style="color: #0D3B66; font-weight: 600; font-size: 10px;">${statusLabel}</td>
-                    <td style="font-size: 10px;">${proc.fase}</td>
-                    <td style="color: #0D3B66; font-weight: 600; font-size: 10px;">${checkCompleto}/${totalCheck}</td>
-                    ${valorHonorarios}
-                </tr>`;
-            });
-            html += '</tbody></table>';
-            container.innerHTML = html;
+                    tabelaHTML += `<tr>
+                        <td><strong>${proc.nomeEmpresa}</strong></td>
+                        <td style="font-size: 10px;">${proc.cnpj}</td>
+                        <td style="font-size: 10px;">${dataAbertura}</td>
+                        <td style="color: #0D3B66; font-weight: 600; font-size: 10px;">${statusLabel}</td>
+                        <td style="font-size: 10px;">${proc.fase}</td>
+                        <td style="color: #0D3B66; font-weight: 600; font-size: 10px;">${checkCompleto}/${totalCheck}</td>
+                    </tr>`;
+                });
+            } else {
+                // ADMIN/CONTADOR/VISUALIZAÇÃO: COM COLUNA DE HONORÁRIOS
+                tabelaHTML = `<table style="font-size: 11px;"><thead><tr><th>Empresa</th><th>CNPJ</th><th>Data Abertura</th><th>Status</th><th>Fase</th><th>Checklist</th><th>Honorários</th></tr></thead><tbody>`;
+                processos.forEach(proc => {
+                    const checkCompleto = Object.values(proc.checklist).filter(v => v).length;
+                    const totalCheck = Object.keys(proc.checklist).length;
+                    const statusLabel = statusLabels[proc.status] || proc.status;
+                    let dataAbertura = '-';
+                    if (proc.dataAbertura && proc.dataAbertura !== '-' && proc.dataAbertura.trim() !== '') {
+                        try {
+                            const date = new Date(proc.dataAbertura + 'T00:00:00');
+                            if (!isNaN(date.getTime())) {
+                                dataAbertura = date.toLocaleDateString('pt-BR');
+                            }
+                        } catch(e) {
+                            dataAbertura = proc.dataAbertura;
+                        }
+                    }
+                    tabelaHTML += `<tr>
+                        <td><strong>${proc.nomeEmpresa}</strong></td>
+                        <td style="font-size: 10px;">${proc.cnpj}</td>
+                        <td style="font-size: 10px;">${dataAbertura}</td>
+                        <td style="color: #0D3B66; font-weight: 600; font-size: 10px;">${statusLabel}</td>
+                        <td style="font-size: 10px;">${proc.fase}</td>
+                        <td style="color: #0D3B66; font-weight: 600; font-size: 10px;">${checkCompleto}/${totalCheck}</td>
+                        <td style="font-size: 10px; color: #2d5016; font-weight: bold;">R$ ${proc.honorarios || '0,00'}</td>
+                    </tr>`;
+                });
+            }
+            tabelaHTML += '</tbody></table>';
+            container.innerHTML = tabelaHTML;
         }
 
         // PREENCHIMENTO AUTOMÁTICO QUANDO SELECIONA PROCESSO
