@@ -482,27 +482,6 @@
             border-top: 1px solid #eee;
         }
     </style>
-    
-    <!-- FIREBASE SCRIPTS -->
-    <script src="https://www.gstatic.com/firebaseapp/10.7.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebaseapp/10.7.0/firebase-database-compat.js"></script>
-    
-    <script>
-        // Configuração Firebase (ADICIONE SEUS DADOS)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDmb_mCzw1fBBcWHwmAlNzxFOl-eDKN-gl",
-            authDomain: "agj-contabilidade.firebaseapp.com",
-            databaseURL: "https://agj-contabilidade-default-rtdb.firebaseio.com",
-            projectId: "agj-contabilidade",
-            storageBucket: "agj-contabilidade.appspot.com",
-            messagingSenderId: "586326069475",
-            appId: "1:586326069475:web:2c228b3973338ae9g56c75d6"
-        };
-
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        window.database = firebase.database();
-    </script>
 </head>
 <body>
     <!-- TELA DE LOGIN -->
@@ -1213,39 +1192,6 @@
             usuarios: JSON.parse(localStorage.getItem('dados_usuarios')) || []
         };
 
-        // CARREGAR E SINCRONIZAR COM FIREBASE
-        function carregarDadosFirebase() {
-            window.database.ref('societario').on('value', (snapshot) => {
-                dados.societario = snapshot.val() || [];
-                localStorage.setItem('dados_societario', JSON.stringify(dados.societario));
-                renderizarSocietario();
-            });
-
-            window.database.ref('contabil').on('value', (snapshot) => {
-                dados.contabil = snapshot.val() || [];
-                localStorage.setItem('dados_contabil', JSON.stringify(dados.contabil));
-                renderizarContabil();
-            });
-
-            window.database.ref('fiscal').on('value', (snapshot) => {
-                dados.fiscal = snapshot.val() || [];
-                localStorage.setItem('dados_fiscal', JSON.stringify(dados.fiscal));
-                renderizarFiscal();
-            });
-
-            window.database.ref('pessoal').on('value', (snapshot) => {
-                dados.pessoal = snapshot.val() || [];
-                localStorage.setItem('dados_pessoal', JSON.stringify(dados.pessoal));
-                renderizarPessoal();
-            });
-
-            window.database.ref('usuarios').on('value', (snapshot) => {
-                dados.usuarios = snapshot.val() || [];
-                localStorage.setItem('dados_usuarios', JSON.stringify(dados.usuarios));
-                renderizarUsuarios();
-            });
-        }
-
         // INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('formSocietario').addEventListener('submit', salvarSocietario);
@@ -1254,8 +1200,6 @@
             document.getElementById('formPessoal').addEventListener('submit', salvarPessoal);
             document.getElementById('formUsuarios').addEventListener('submit', salvarUsuario);
 
-            // Carregar dados do Firebase
-            carregarDadosFirebase();
             renderizarTodos();
             verificarLogin();
         });
@@ -1314,7 +1258,6 @@
 
             dados.societario.push(processo);
             localStorage.setItem('dados_societario', JSON.stringify(dados.societario));
-            window.database.ref('societario').set(dados.societario);
 
             mostrarAlerta('✅ Processo salvo com sucesso!', 'alertaSocietario', 'success');
             document.getElementById('formSocietario').reset();
@@ -1452,7 +1395,6 @@
             });
 
             localStorage.setItem('dados_societario', JSON.stringify(dados.societario));
-            window.database.ref('societario').set(dados.societario);
             mostrarAlerta('✅ Processo atualizado!', 'alertaSocietario', 'success');
             fecharModal('modalEditSocietario');
             renderizarSocietario();
@@ -1465,7 +1407,6 @@
             if (confirm('Tem certeza?')) {
                 dados.societario = dados.societario.filter(p => p.id !== id);
                 localStorage.setItem('dados_societario', JSON.stringify(dados.societario));
-            window.database.ref('societario').set(dados.societario);
                 renderizarSocietario();
                 renderizarProcessosDisponiveisContabil();
                 renderizarProcessosDisponiveisFiscal();
@@ -1520,7 +1461,6 @@
             reg.reuniao = document.getElementById('edit_cont_reuniao').value;
             reg.pendencias = document.getElementById('edit_cont_pendencias').value;
             localStorage.setItem('dados_contabil', JSON.stringify(dados.contabil));
-            window.database.ref('contabil').set(dados.contabil);
             mostrarAlerta('✅ Registro atualizado!', 'alertaContabil', 'success');
             fecharModal('modalEditContabil');
             renderizarContabil();
@@ -1530,7 +1470,6 @@
             if (confirm('Tem certeza?')) {
                 dados.contabil = dados.contabil.filter(r => r.id !== id);
                 localStorage.setItem('dados_contabil', JSON.stringify(dados.contabil));
-            window.database.ref('contabil').set(dados.contabil);
                 renderizarContabil();
             }
         }
@@ -1582,7 +1521,6 @@
             reg.reuniao = document.getElementById('edit_fisc_reuniao').value;
             reg.pendencias = document.getElementById('edit_fisc_pendencias').value;
             localStorage.setItem('dados_fiscal', JSON.stringify(dados.fiscal));
-            window.database.ref('fiscal').set(dados.fiscal);
             mostrarAlerta('✅ Registro atualizado!', 'alertaFiscal', 'success');
             fecharModal('modalEditFiscal');
             renderizarFiscal();
@@ -1592,7 +1530,6 @@
             if (confirm('Tem certeza?')) {
                 dados.fiscal = dados.fiscal.filter(r => r.id !== id);
                 localStorage.setItem('dados_fiscal', JSON.stringify(dados.fiscal));
-            window.database.ref('fiscal').set(dados.fiscal);
                 renderizarFiscal();
             }
         }
@@ -1649,7 +1586,6 @@
             reg.reuniao = document.getElementById('edit_pess_reuniao').value;
             reg.pendencias = document.getElementById('edit_pess_pendencias').value;
             localStorage.setItem('dados_pessoal', JSON.stringify(dados.pessoal));
-            window.database.ref('pessoal').set(dados.pessoal);
             mostrarAlerta('✅ Registro atualizado!', 'alertaPessoal', 'success');
             fecharModal('modalEditPessoal');
             renderizarPessoal();
@@ -1659,7 +1595,6 @@
             if (confirm('Tem certeza?')) {
                 dados.pessoal = dados.pessoal.filter(r => r.id !== id);
                 localStorage.setItem('dados_pessoal', JSON.stringify(dados.pessoal));
-            window.database.ref('pessoal').set(dados.pessoal);
                 renderizarPessoal();
             }
         }
@@ -1678,7 +1613,6 @@
             };
             dados.usuarios.push(usuario);
             localStorage.setItem('dados_usuarios', JSON.stringify(dados.usuarios));
-            window.database.ref('usuarios').set(dados.usuarios);
             mostrarAlerta('✅ Usuário cadastrado!', 'alertaUsuarios', 'success');
             document.getElementById('formUsuarios').reset();
             renderizarUsuarios();
@@ -1747,7 +1681,6 @@
             usu.telefone = document.getElementById('edit_usu_telefone').value;
             usu.papel = document.getElementById('edit_usu_papel').value;
             localStorage.setItem('dados_usuarios', JSON.stringify(dados.usuarios));
-            window.database.ref('usuarios').set(dados.usuarios);
             mostrarAlerta('✅ Usuário atualizado!', 'alertaUsuarios', 'success');
             fecharModal('modalEditUsuarios');
             renderizarUsuarios();
@@ -1757,7 +1690,6 @@
             if (confirm('Tem certeza? Ao deletar o usuário, todos os seus dados será removidos.')) {
                 dados.usuarios = dados.usuarios.filter(u => u.id !== id);
                 localStorage.setItem('dados_usuarios', JSON.stringify(dados.usuarios));
-            window.database.ref('usuarios').set(dados.usuarios);
                 renderizarUsuarios();
             }
         }
@@ -1778,7 +1710,6 @@
             };
             dados.contabil.push(registro);
             localStorage.setItem('dados_contabil', JSON.stringify(dados.contabil));
-            window.database.ref('contabil').set(dados.contabil);
             mostrarAlerta('✅ Registro salvo!', 'alertaContabil', 'success');
             document.getElementById('formContabil').reset();
             renderizarContabil();
@@ -1820,7 +1751,6 @@
             };
             dados.fiscal.push(registro);
             localStorage.setItem('dados_fiscal', JSON.stringify(dados.fiscal));
-            window.database.ref('fiscal').set(dados.fiscal);
             mostrarAlerta('✅ Registro salvo!', 'alertaFiscal', 'success');
             document.getElementById('formFiscal').reset();
             renderizarFiscal();
@@ -1863,7 +1793,6 @@
             };
             dados.pessoal.push(registro);
             localStorage.setItem('dados_pessoal', JSON.stringify(dados.pessoal));
-            window.database.ref('pessoal').set(dados.pessoal);
             mostrarAlerta('✅ Registro salvo!', 'alertaPessoal', 'success');
             document.getElementById('formPessoal').reset();
             renderizarPessoal();
